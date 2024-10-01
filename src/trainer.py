@@ -2,11 +2,12 @@ import os
 from typing import Dict, Optional
 
 import torch
+from sklearn.metrics import classification_report
 from torch import nn
 from torch.cuda.amp.grad_scaler import GradScaler
 from tqdm import tqdm
 
-from src.constants import CKPT_FILE
+from src.constants import CKPT_FILE, CATEGORIES
 from src.utils import dict_to_device
 
 
@@ -67,8 +68,9 @@ class Trainer:
         return {'loss': loss, 'lr': self.lr_scheduler.get_last_lr()[0]}
 
     def valid_step(self, batch_data) -> Dict[str, torch.Tensor]:
-        pred = self.model(batch_data['audio'])
-        loss = self.criterion(pred, batch_data['label'].float())
+        outputs = self.model(batch_data['audio'])
+        loss = self.criterion(outputs, batch_data['label'].float())
+        pred = self.model.predict(batch_data['audio'])
         return {'loss': loss, 'pred': pred, 'label': batch_data['label']}
 
     def train_one_epoch(self) -> None:
@@ -121,11 +123,17 @@ class Trainer:
             ):
                 output = self.valid_step(batch_data)
             outputs.append(output)
+
         progress_bar.close()
         loss = torch.tensor([o['loss'] for o in outputs]).mean().item()
         record = {'valid_loss': round(loss, 4)}
         self.log({'epoch': self.cur_ep} | record | {'best_loss': self.best_loss})
         print(record)
+
+        preds = torch.cat([o['pred'] for o in outputs]).float().cpu().numpy()
+        labels = torch.cat([o['label'] for o in outputs]).float().cpu().numpy()
+        report = classification_report(labels, preds, target_names=CATEGORIES)
+        print(report)
 
         if record['valid_loss'] < self.best_loss:
             self.best_loss = record['valid_loss']

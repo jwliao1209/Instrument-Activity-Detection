@@ -7,7 +7,7 @@ import seaborn as sns
 from sklearn.metrics import classification_report
 from tqdm import tqdm
 
-from src.constants import CKPT_FILE, RESULT_DIR
+from src.constants import CKPT_FILE, RESULT_DIR, CATEGORIES
 from src.dataset import MusicDataset
 from src.model import MERTClassifier
 from src.transform import get_transforms
@@ -24,7 +24,7 @@ def parse_arguments() -> Namespace:
     parser.add_argument(
         '--ckpt_dir',
         type=str,
-        default='checkpoints/09-28-21-01-31',
+        default='checkpoints/10-01-21-18-42',
     )
     return parser.parse_args()
 
@@ -59,19 +59,5 @@ if __name__ == "__main__":
     preds = torch.cat(preds).cpu().numpy()
     labels = torch.cat(labels).cpu().numpy()
 
-    report = classification_report(
-        labels,
-        preds,
-        target_names=[
-            'Piano',
-            'Percussion',
-            'Organ',
-            'Guitar',
-            'Bass',
-            'Strings',
-            'Voice',
-            'Wind Instruments',
-            'Synth',
-        ]
-    )
+    report = classification_report(labels, preds, target_names=CATEGORIES)
     print(report)

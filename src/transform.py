@@ -5,6 +5,8 @@ import numpy as np
 from torchvision.transforms import Compose
 from transformers import Wav2Vec2FeatureExtractor
 
+from src.constants import MODEL_NAME, SAMPLE_RATE
+
 
 class BaseTransform(object):
     def __init__(self, keys, **kwargs):
@@ -39,18 +41,15 @@ class ProcessAudio(BaseTransform):
     def __init__(self, keys, **kwargs):
         super(ProcessAudio, self).__init__(keys, **kwargs)
         processor = Wav2Vec2FeatureExtractor.from_pretrained(
-            "m-a-p/MERT-v1-95M",
+            MODEL_NAME,
             trust_remote_code=True,
         )
         self.processor = partial(
-            processor,
-            sampling_rate=24000,
-            return_tensors='pt',
-            padding=True,
+            processor, sampling_rate=SAMPLE_RATE, return_tensors='pt', padding=True,
         )
 
     def _process(self, single_data, **kwargs):
-        return self.processor(single_data)
+        return self.processor(single_data).input_values
 
 
 class ToTensord(BaseTransform):

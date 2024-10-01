@@ -18,21 +18,16 @@ from src.utils import set_random_seeds, get_time, read_json, save_json
 
 def parse_arguments() -> Namespace:
     parser = ArgumentParser(description='Train DL model')
-    # parser.add_argument(
-    #     '--train_data_path',
-    #     type=str,
-    #     default='dataset/train.json',
-    # )
-    # parser.add_argument(
-    #     '--valid_data_path',
-    #     type=str,
-    #     default='dataset/valid.json',
-    # )
-    # parser.add_argument(
-    #     '--test_data_path',
-    #     type=str,
-    #     default='dataset/test.json',
-    # )
+    parser.add_argument(
+        '--train_data_path',
+        type=str,
+        default='dataset/train.json',
+    )
+    parser.add_argument(
+        '--valid_data_path',
+        type=str,
+        default='dataset/valid.json',
+    )
     parser.add_argument(
         '--epochs',
         type=int,
@@ -68,16 +63,16 @@ if __name__ == '__main__':
     os.makedirs(checkpoint_dir, exist_ok=True)
     save_json(vars(args), os.path.join(checkpoint_dir, CONFIG_FILE))
 
-    train_data = read_json('dataset/train.json')
-    test_data = read_json('dataset/test.json')
+    train_data = read_json(args.train_data_path)
+    valid_data = read_json(args.valid_data_path)
 
     transforms = get_transforms()
     train_loader = MusicDataset(train_data, transforms).get_loader(args.batch_size, True, 4)
-    test_loader = MusicDataset(test_data, transforms).get_loader(args.batch_size, False, 4)
+    test_loader = MusicDataset(valid_data, transforms).get_loader(args.batch_size, False, 4)
 
     # Prepare training
     device = torch.device(f'cuda:0'if torch.cuda.is_available() else 'cpu')
-    model = MERTClassifier(num_classes=9)
+    model = MERTClassifier()
     criterion = nn.BCEWithLogitsLoss()
     optimizer = torch.optim.AdamW(
         model.parameters(),
