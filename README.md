@@ -1,6 +1,6 @@
 # Instrument-Activity-Detection
 
-This repository contains the implementation for Homework 1 of the CommE5070 Deep Learning for Music Analysis and Generation course, Fall 2024, at National Taiwan University. For a detailed report, please refer to this [slides]().
+This repository contains the implementation for Homework 1 of the CommE5070 Deep Learning for Music Analysis and Generation course, Fall 2024, at National Taiwan University. For a detailed report, please refer to this [slides](https://docs.google.com/presentation/d/1-gXmFUJInCMMKa3ISmMDKD37zjx9JIyQBKthhEseU7c/edit?usp=sharing).
 
 
 ## Setup
