@@ -29,6 +29,12 @@ def parse_arguments() -> Namespace:
         default='dataset/valid.json',
     )
     parser.add_argument(
+        '--model_name',
+        type=str,
+        # default='m-a-p/MERT-v1-330M',
+        default='m-a-p/MERT-v1-95M',
+    )
+    parser.add_argument(
         '--epochs',
         type=int,
         default=10,
@@ -66,13 +72,13 @@ if __name__ == '__main__':
     train_data = read_json(args.train_data_path)
     valid_data = read_json(args.valid_data_path)
 
-    transforms = get_transforms()
+    transforms = get_transforms(model_name=args.model_name)
     train_loader = MusicDataset(train_data, transforms).get_loader(args.batch_size, True, 4)
     test_loader = MusicDataset(valid_data, transforms).get_loader(args.batch_size, False, 4)
 
     # Prepare training
     device = torch.device(f'cuda:0'if torch.cuda.is_available() else 'cpu')
-    model = MERTClassifier()
+    model = MERTClassifier(model_name=args.model_name)
     criterion = nn.BCEWithLogitsLoss()
     optimizer = torch.optim.AdamW(
         model.parameters(),

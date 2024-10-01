@@ -4,7 +4,7 @@ import torch
 from torch import nn
 from transformers import AutoModel
 
-from src.constants import MODEL_NAME, NUM_CLASSES
+from src.constants import NUM_CLASSES
 
 
 class MERTClassifier(nn.Module):
@@ -13,7 +13,7 @@ class MERTClassifier(nn.Module):
         model_name: str = None,
         num_classes: int = None,
         hidden_states: str = 'first',
-        hidden_dim: int = 768,
+        hidden_dim: int = 1024,
         thresholds: List[int] = None,
         pretrain: bool = True
     ) -> None:
@@ -30,10 +30,14 @@ class MERTClassifier(nn.Module):
             pretrained (bool, optional): Whether to freeze the pretrained MERT model's parameters. Defaults to True.
         """
         super(MERTClassifier, self).__init__()
+        self.model_name = model_name
         self.num_classes = num_classes if num_classes is not None else NUM_CLASSES
         self.hidden_states = hidden_states
         self.thresholds = thresholds if thresholds is not None else [0.5] * self.num_classes
         self.mert_model = self.load_mert_model(pretrain)
+
+        hidden_dim = self.mert_model.encoder.layers[-2].feed_forward.output_dense.out_features
+
         self.pool = nn.AdaptiveAvgPool1d(1)
         self.fc = nn.Linear(hidden_dim, self.num_classes)
 
@@ -48,7 +52,7 @@ class MERTClassifier(nn.Module):
         Returns:
             Pretrained MERT model with frozen or unfrozen parameters.
         """
-        mert_model = AutoModel.from_pretrained(MODEL_NAME, trust_remote_code=True)
+        mert_model = AutoModel.from_pretrained(self.model_name, trust_remote_code=True)
         if pretrain:
             for param in mert_model.parameters():
                 param.requires_grad = False

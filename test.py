@@ -42,7 +42,7 @@ if __name__ == "__main__":
     # Prepare inference
     checkpoint = torch.load(os.path.join(args.ckpt_dir, CKPT_FILE), weights_only=True)
     device = torch.device(f'cuda:0'if torch.cuda.is_available() else 'cpu')
-    model = MERTClassifier()
+    model = MERTClassifier(config.model_name)
     model.load_state_dict(checkpoint['model'])
     model = model.to(device)
     model.eval()
