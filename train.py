@@ -4,8 +4,6 @@ from argparse import ArgumentParser, Namespace
 import torch
 import wandb
 from torch import nn
-from transformers import AutoModel
-from tqdm import tqdm
 
 from src.constants import PROJECT_NAME, CHECKPOINT_DIR, CONFIG_FILE
 from src.dataset import MusicDataset
@@ -31,8 +29,19 @@ def parse_arguments() -> Namespace:
     parser.add_argument(
         '--model_name',
         type=str,
-        # default='m-a-p/MERT-v1-330M',
-        default='m-a-p/MERT-v1-95M',
+        default='m-a-p/MERT-v1-330M',
+        choices=['m-a-p/MERT-v1-330M', 'm-a-p/MERT-v1-95M'],
+    )
+    parser.add_argument(
+        '--hidden_states',
+        type=str,
+        default='first',
+        choices=['first', 'all'],
+    )
+    parser.add_argument(
+        '--fine_tune_method',
+        default='last_layer',
+        choices=['last_layer', 'lora', 'full'],
     )
     parser.add_argument(
         '--epochs',
@@ -78,7 +87,11 @@ if __name__ == '__main__':
 
     # Prepare training
     device = torch.device(f'cuda:0'if torch.cuda.is_available() else 'cpu')
-    model = MERTClassifier(model_name=args.model_name)
+    model = MERTClassifier(
+        model_name=args.model_name,
+        hidden_states=args.hidden_states,
+        fine_tune_method=args.fine_tune_method,
+    )
     criterion = nn.BCEWithLogitsLoss()
     optimizer = torch.optim.AdamW(
         model.parameters(),
