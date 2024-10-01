@@ -13,7 +13,6 @@ class MERTClassifier(nn.Module):
         model_name: str = None,
         num_classes: int = None,
         hidden_states: str = 'first',
-        hidden_dim: int = 1024,
         thresholds: List[int] = None,
         pretrain: bool = True
     ) -> None:
@@ -25,7 +24,6 @@ class MERTClassifier(nn.Module):
             model_name (str): Name of the pretrained model.
             num_classes (int): Number of output classes for the classification.
             hidden_states (str, optional): Hidden states to use for classification. Defaults to 'first'.
-            hidden_dim (int, optional): Dimensionality of the hidden states. Defaults to 768.
             thresholds (list, optional): Thresholds for classification. Defaults to None.
             pretrained (bool, optional): Whether to freeze the pretrained MERT model's parameters. Defaults to True.
         """
