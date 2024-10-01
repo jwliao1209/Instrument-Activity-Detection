@@ -32,7 +32,7 @@ class MERTClassifier(nn.Module):
         super(MERTClassifier, self).__init__()
         self.num_classes = num_classes if num_classes is not None else NUM_CLASSES
         self.hidden_states = hidden_states
-        self.thresholds = thresholds if thresholds is not None else [0.5] * num_classes
+        self.thresholds = thresholds if thresholds is not None else [0.5] * self.num_classes
         self.mert_model = self.load_mert_model(pretrain)
         self.pool = nn.AdaptiveAvgPool1d(1)
         self.fc = nn.Linear(hidden_dim, self.num_classes)

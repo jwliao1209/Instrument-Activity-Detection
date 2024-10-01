@@ -1,5 +1,6 @@
 PROJECT_NAME = 'DeepMIR_HW1'
-MODEL_NAME = 'm-a-p/MERT-v1-95M'
+# MODEL_NAME = 'm-a-p/MERT-v1-95M'
+MODEL_NAME = 'm-a-p/MERT-v1-330M'
 DATA_DIR = 'dataset'
 RESULT_DIR = 'results'
 CHECKPOINT_DIR = 'checkpoints'
