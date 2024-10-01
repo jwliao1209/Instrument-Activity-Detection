@@ -3,10 +3,10 @@ from argparse import ArgumentParser, Namespace
 
 import torch
 import wandb
-from torch import nn
 
 from src.constants import PROJECT_NAME, CHECKPOINT_DIR, CONFIG_FILE
 from src.dataset import MusicDataset
+from src.losses import get_loss
 from src.model import MERTClassifier
 from src.optimization import get_lr_scheduler
 from src.trainer import Trainer
@@ -42,6 +42,12 @@ def parse_arguments() -> Namespace:
         '--fine_tune_method',
         default='last_layer',
         choices=['last_layer', 'lora', 'full'],
+    )
+    parser.add_argument(
+        '--loss',
+        type=str,
+        default='bce_with_logits',
+        choices=['bce_with_logits', 'focal_bce_with_logits'],
     )
     parser.add_argument(
         '--epochs',
@@ -92,7 +98,7 @@ if __name__ == '__main__':
         hidden_states=args.hidden_states,
         fine_tune_method=args.fine_tune_method,
     )
-    criterion = nn.BCEWithLogitsLoss()
+    criterion = get_loss(name=args.loss)
     optimizer = torch.optim.AdamW(
         model.parameters(),
         lr=args.lr,

@@ -1,5 +1,4 @@
 import os
-import json
 from argparse import ArgumentParser, Namespace
 from glob import glob
 
@@ -11,7 +10,7 @@ import torch
 from transformers import Wav2Vec2FeatureExtractor
 from tqdm import tqdm
 
-from src.constants import CKPT_FILE, CATEGORIES, MODEL_NAME, SAMPLE_RATE, RESULT_DIR
+from src.constants import CKPT_FILE, CATEGORIES, SAMPLE_RATE, RESULT_DIR
 from src.model import MERTClassifier
 from src.utils import read_json
 
@@ -32,7 +31,7 @@ def parse_arguments() -> Namespace:
     parser.add_argument(
         '--ckpt_dir',
         type=str,
-        default='checkpoints/10-01-19-47-49',
+        default='checkpoints/10-02-04-36-30',
     )
     return parser.parse_args()
 
@@ -121,14 +120,30 @@ def predict_pianoroll(audio_path, length, processor, model, device, chunk_durati
 def main(args):
     os.makedirs(RESULT_DIR, exist_ok=True)
     audio_path_list = glob(os.path.join(args.test_track_dir, '*.flac'))
+    config = read_json(os.path.join(args.ckpt_dir, 'config.json'))
 
     processor = Wav2Vec2FeatureExtractor.from_pretrained(
-        MODEL_NAME, trust_remote_code=True,
+        config['model_name'], trust_remote_code=True,
     )
 
     checkpoint = torch.load(os.path.join(args.ckpt_dir, CKPT_FILE), weights_only=True)
     device = torch.device(f'cuda:0'if torch.cuda.is_available() else 'cpu')
-    model = MERTClassifier()
+    model = MERTClassifier(
+        model_name=config['model_name'],
+        hidden_states=config['hidden_states'],
+        fine_tune_method=config['fine_tune_method'],
+        thresholds=[
+            0.85112745,
+            0.111269526,
+            0.17468038,
+            0.7682016,
+            0.86039627,
+            0.5402954,
+            0.13542163,
+            0.43342066,
+            0.21783678,
+        ]
+    )
     model.load_state_dict(checkpoint['model'])
     model = model.to(device)
     model.eval()

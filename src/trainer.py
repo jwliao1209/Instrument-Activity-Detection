@@ -65,13 +65,22 @@ class Trainer:
     def train_step(self, batch_data) -> Dict[str, torch.Tensor]:
         outputs = self.model(batch_data['audio'])
         loss = self.criterion(outputs, batch_data['label'].float())
-        return {'loss': loss, 'lr': self.lr_scheduler.get_last_lr()[0]}
+        return {
+            'loss': loss,
+            'lr': self.lr_scheduler.get_last_lr()[0],
+            'vram_allocated_MB': torch.cuda.memory_allocated() / (1024 ** 2),
+            'vram_reserved_MB': torch.cuda.memory_reserved() / (1024 ** 2),
+        }
 
     def valid_step(self, batch_data) -> Dict[str, torch.Tensor]:
         outputs = self.model(batch_data['audio'])
         loss = self.criterion(outputs, batch_data['label'].float())
         pred = self.model.predict(batch_data['audio'])
-        return {'loss': loss, 'pred': pred, 'label': batch_data['label']}
+        return {
+            'loss': loss,
+            'pred': pred,
+            'label': batch_data['label'],
+        }
 
     def train_one_epoch(self) -> None:
         progress_bar = tqdm(self.train_loader, desc=f"Training {self.cur_ep}")

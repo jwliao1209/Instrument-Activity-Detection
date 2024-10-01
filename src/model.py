@@ -39,8 +39,8 @@ class MERTClassifier(nn.Module):
 
         elif self.fine_tune_method == 'lora':
             lora_config = LoraConfig(
-                r=4,
-                lora_alpha=8,
+                r=8,
+                lora_alpha=16,
                 lora_dropout=0.1,
                 target_modules=['q_proj', 'v_proj'],
             )
@@ -62,7 +62,9 @@ class MERTClassifier(nn.Module):
         return self.fc(time_reduced_states)
 
     @torch.no_grad()
+    def predict_proba(self, x):
+        return torch.sigmoid(self(x))
+
     def predict(self, x):
         thresholds_tensor = torch.tensor(self.thresholds, device=x.device)
-        probs = torch.sigmoid(self(x))
-        return (probs > thresholds_tensor).int()
+        return (self.predict_proba(x) > thresholds_tensor).int()

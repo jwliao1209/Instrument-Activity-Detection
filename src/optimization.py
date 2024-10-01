@@ -35,3 +35,5 @@ def get_lr_scheduler(
             optimizer=optimizer,
             T_max=epochs * steps_for_one_epoch,
         )
+    else:
+        raise ValueError(f"Scheduler {name} not found")
