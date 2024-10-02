@@ -63,8 +63,8 @@ class MERTClassifier(nn.Module):
 
     @torch.no_grad()
     def predict_proba(self, x):
-        return torch.sigmoid(self(x))
+        return torch.sigmoid(self(x)).cpu()
 
     def predict(self, x):
-        thresholds_tensor = torch.tensor(self.thresholds, device=x.device)
+        thresholds_tensor = torch.tensor(self.thresholds)
         return (self.predict_proba(x) > thresholds_tensor).int()

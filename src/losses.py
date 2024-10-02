@@ -3,7 +3,7 @@ import torch.nn as nn
 
 
 class FocalBCEWithLogitsLoss(nn.Module):
-    def __init__(self, alpha=1, gamma=2, reduction='mean'):
+    def __init__(self, alpha=1, gamma=1, reduction='mean'):
         super(FocalBCEWithLogitsLoss, self).__init__()
         self.alpha = alpha
         self.gamma = gamma
@@ -13,12 +13,8 @@ class FocalBCEWithLogitsLoss(nn.Module):
     def forward(self, x, y):
         bce_loss = self.bce_loss(x, y)
         probas = torch.sigmoid(x)
-        focal_factor = torch.where(y == 1, (1 - probas) ** self.gamma, probas ** self.gamma)
-        loss = focal_factor * bce_loss
-
-        if self.alpha is not None:
-            alpha_factor = torch.where(y == 1, self.alpha, 1 - self.alpha)
-            loss = alpha_factor * loss
+        p_t = torch.where(y == 1, (1 - probas), probas)
+        loss = self.alpha * (p_t ** self.gamma) * bce_loss
 
         if self.reduction == 'mean':
             return loss.mean()

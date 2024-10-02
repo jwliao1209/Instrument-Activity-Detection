@@ -31,7 +31,13 @@ def parse_arguments() -> Namespace:
     parser.add_argument(
         '--ckpt_dir',
         type=str,
-        default='checkpoints/10-02-04-36-30',
+        default='checkpoints/10-02-05-21-25',
+    )
+    parser.add_argument(
+        '--thresholds',
+        type=float,
+        nargs='+',
+        default=[0.5],
     )
     return parser.parse_args()
 
@@ -132,17 +138,7 @@ def main(args):
         model_name=config['model_name'],
         hidden_states=config['hidden_states'],
         fine_tune_method=config['fine_tune_method'],
-        thresholds=[
-            0.85112745,
-            0.111269526,
-            0.17468038,
-            0.7682016,
-            0.86039627,
-            0.5402954,
-            0.13542163,
-            0.43342066,
-            0.21783678,
-        ]
+        thresholds=args.thresholds,
     )
     model.load_state_dict(checkpoint['model'])
     model = model.to(device)
@@ -152,17 +148,17 @@ def main(args):
         src_path = audio_path.replace('.flac', '.mid')
         filename = os.path.splitext(os.path.basename(audio_path))[0]
         true_pianoroll = extract_pianoroll_from_midi(src_path)
-        print(f"source path: {src_path}")
-        print(f"audio path: {audio_path}")
+        print(f'source path: {src_path}')
+        print(f'audio path: {audio_path}')
 
         # pred_pianoroll is your model predict result please load your results here
         # pred_pianoroll.shape should be [9, L] and the L should be equal to true_pianoroll
         length = true_pianoroll.shape[1]
         pred_pianoroll = predict_pianoroll(audio_path, length, processor, model, device)
 
-        print(true_pianoroll.shape)
-        print(pred_pianoroll.shape)
-        
+        print(f'true pianoroll shape: {true_pianoroll.shape}')
+        print(f'pred pianoroll shape: {pred_pianoroll.shape}')
+
         pianoroll_comparison(true_pianoroll, pred_pianoroll, os.path.join(RESULT_DIR, f'{filename}.png'))
 
 
