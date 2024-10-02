@@ -43,7 +43,7 @@ bash scripts/train.sh
 ## Reproducing
 To reproduce the inference results, run the command:
 ```
-bash scripts/run_reproduce.sh
+bash scripts/reproduce.sh
 ```
 
 

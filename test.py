@@ -77,7 +77,7 @@ if __name__ == "__main__":
     thresholds = dict()
     best_thresholds = dict()
 
-    plt.figure()
+    plt.figure(figsize=(6, 6), dpi=600)
     for i in range(NUM_CLASSES):
         fpr[i], tpr[i], thresholds[i] = roc_curve(labels[:, i], probas[:, i])
         roc_auc[i] = auc(fpr[i], tpr[i])
@@ -89,7 +89,7 @@ if __name__ == "__main__":
 
         plt.plot(
             fpr[i], tpr[i],
-            label=f'{CATEGORIES[i]} (Best Threshold = {best_thresholds[i]:.2f})'
+            label=f'{CATEGORIES[i]} (AUC: {roc_auc[i]:.2f})'
         )
 
         print(i, best_thresholds[i])

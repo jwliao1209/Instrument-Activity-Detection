@@ -1,10 +1,10 @@
 #!/bin/bash
 
 # # Prepare the dataset
-# python prepare_dataset.py --data_path hw1/slakh/test_labels.json --data_folder hw1/slakh/test --save_path dataset/test.json
+python prepare_dataset.py --data_path hw1/slakh/test_labels.json --data_folder hw1/slakh/test --save_path dataset/test.json
 
 # # Inference
-# python test.py --ckpt_dir checkpoints/10-02-06-52-56
+python test.py --ckpt_dir checkpoints/10-02-06-52-56
 
 # Plot the pianoroll
 python plot_pianoroll.py \
