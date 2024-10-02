@@ -26,17 +26,25 @@ bash scripts/download_ckpt.sh
 ```
 
 
-### Reproducing
-- If you want to reproduce the inference result, you can run:
+## Dataset Preparation
+To prepare the training, validation, and test datasets, execute the following command:
+```
+bash scripts/prepare_data.sh
+```
+
+
+## Training
+To train the model, run the command:
+```
+bash scripts/train.sh
+```
+
+
+## Reproducing
+To reproduce the inference results, run the command:
 ```
 bash scripts/run_reproduce.sh
 ```
-
-## Preparing Dataset
-```
-python prepare_dataset.py
-```
-
 
 
 ## Environment
